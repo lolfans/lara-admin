@@ -16,4 +16,24 @@ class CategoryService
     {
         return Category::getCategory($rank);
     }
+
+    public function getCategoryAll()
+    {
+        return Category::get();
+    }
+
+    public function store($data)
+    {
+        return Category::create($data);
+    }
+
+    public function getOne($id)
+    {
+        return Category::findOrFail($id);
+    }
+
+    public function getWithChildAndArticle($id)
+    {
+        return Category::with(['childs', 'articles'])->find($id);
+    }
 }

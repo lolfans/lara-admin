@@ -3,19 +3,26 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\ConfigGroupRequest;
+use App\Service\ConfigGroupService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
-use App\Models\ConfigGroup;
-use Illuminate\Support\Facades\DB;
 
 class ConfigGroupController extends Controller
 {
+    protected $configService;
+
+    public function __construct(ConfigGroupService $configGroupService)
+    {
+        $this->configService = $configGroupService;
+    }
+
     /**
      * 标签列表
+     *
      * @return \Illuminate\Contracts\View\View
      */
     public function index()
@@ -25,13 +32,13 @@ class ConfigGroupController extends Controller
 
     /**
      * 标签数据接口
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function data(Request $request)
     {
-
-        $res = ConfigGroup::orderBy('sort', 'asc')->orderBy('id', 'desc')->paginate($request->get('limit', 30));
+        $res = $this->configService->getConfigLimit($request);
         $data = [
             'code' => 0,
             'msg' => '正在请求中...',
@@ -43,6 +50,7 @@ class ConfigGroupController extends Controller
 
     /**
      * 添加标签
+     *
      * @return \Illuminate\Contracts\View\View
      */
     public function create()
@@ -52,15 +60,16 @@ class ConfigGroupController extends Controller
 
     /**
      * 添加标签
+     *
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(ConfigGroupRequest $request)
     {
-        $data = $request->all(['name', 'sort']);
         try {
-            ConfigGroup::create($data);
+            $data = $request->all(['name', 'sort']);
+            $this->configService->store($data);
             return Redirect::to(URL::route('admin.config_group'))->with(['success' => '更新成功']);
         } catch (\Exception $exception) {
             return Redirect::back()->withErrors('添加失败');
@@ -80,26 +89,28 @@ class ConfigGroupController extends Controller
 
     /**
      * 更新标签
+     *
      * @param $id
      * @return \Illuminate\Contracts\View\View
      */
     public function edit($id)
     {
-        $configGroup = ConfigGroup::findOrFail($id);
+        $configGroup = $this->configService->getOne($id);
         return View::make('admin.config_group.edit', compact('configGroup'));
     }
 
     /**
      * 更新标签
+     *
      * @param ConfigGroupRequest $request
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(ConfigGroupRequest $request, $id)
     {
-        $configGroup = ConfigGroup::findOrFail($id);
-        $data = $request->all(['name', 'sort']);
+        $configGroup = $this->configService->getOne($id);
         try {
+            $data = $request->all(['name', 'sort']);
             $configGroup->update($data);
             return Redirect::to(URL::route('admin.config_group'))->with(['success' => '更新成功']);
         } catch (\Exception $exception) {
@@ -109,6 +120,7 @@ class ConfigGroupController extends Controller
 
     /**
      * 删除标签
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -118,7 +130,7 @@ class ConfigGroupController extends Controller
         if (!is_array($ids) || empty($ids)) {
             return Response::json(['code' => 1, 'msg' => '请选择删除项']);
         }
-        $group = ConfigGroup::with('configurations')->find($ids[0]);
+        $group = $this->configService->getOneWithConfigurations($ids[0]);
         if ($group->configurations->isNotEmpty()) {
             return Response::json(['code' => 1, 'msg' => '该组存在配置项，禁止删除']);
         }
