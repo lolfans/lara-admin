@@ -1,2 +1,11 @@
-# lara-admin
-laravel-v6.0-layui2.5
+
+## 安装步骤
+### 此版本是基于laravel 6.0 LTS 从大佬那里复制过来备用，感觉挺赞的，保留以免不时之需
+### 原项目在这里 https://github.com/github-muzilong/laravel55-layuiadmin
+- 复制.env.example为.env
+- 配置.env里的数据库连接信息
+- composer install
+- php artisan migrate
+- php artisan db:seed
+- php artisan key:generate
+- 登录后台：host/admin   帐号：root  密码：123456
