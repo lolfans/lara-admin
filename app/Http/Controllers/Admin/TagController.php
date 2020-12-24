@@ -3,35 +3,38 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\TagRequest;
+use App\Service\ArticleService;
+use App\Service\TagService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\View;
-use App\Models\Tag;
 use Illuminate\Support\Facades\DB;
 
 class TagController extends Controller
 {
     /**
      * 标签列表
-     * @return \Illuminate\Contracts\View\View
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function index()
     {
-        return View::make('admin.tag.index');
+        return view('admin.tag.index');
     }
 
     /**
      * 标签数据接口
+     *
      * @param Request $request
+     * @param TagService $tagService
      * @return \Illuminate\Http\JsonResponse
      */
-    public function data(Request $request)
+    public function data(Request $request,TagService $tagService)
     {
-
-        $res = Tag::orderBy('sort', 'asc')->orderBy('id', 'desc')->paginate($request->get('limit', 30));
+        $res = $tagService->getTagLimit($request);
         $data = [
             'code' => 0,
             'msg' => '正在请求中...',
@@ -43,24 +46,27 @@ class TagController extends Controller
 
     /**
      * 添加标签
-     * @return \Illuminate\Contracts\View\View
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function create()
     {
-        return View::make('admin.tag.create');
+        return view('admin.tag.create');
     }
 
     /**
      * 添加标签
-     * @param Request $request
+     *
+     * @param TagRequest $request
+     * @param TagService $tagService
      * @return \Illuminate\Http\RedirectResponse
-     * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(TagRequest $request)
+    public function store(TagRequest $request, TagService $tagService)
     {
-        $data = $request->all(['name', 'sort']);
         try {
-            Tag::create($data);
+            $data = $request->all(['name', 'sort']);
+            $tagService->store($data);
             return Redirect::to(URL::route('admin.tag'))->with(['success' => '更新成功']);
         } catch (\Exception $exception) {
             return Redirect::back()->withErrors('添加失败');
@@ -80,26 +86,31 @@ class TagController extends Controller
 
     /**
      * 更新标签
+     *
      * @param $id
-     * @return \Illuminate\Contracts\View\View
+     * @param TagService $tagService
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
-    public function edit($id)
+    public function edit($id,TagService $tagService)
     {
-        $tag = Tag::findOrFail($id);
-        return View::make('admin.tag.edit', compact('tag'));
+        $tag = $tagService->getOne($id);
+        return view('admin.tag.edit', compact('tag'));
     }
 
     /**
      * 更新标签
+     *
      * @param TagRequest $request
      * @param $id
+     * @param TagService $tagService
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(TagRequest $request, $id)
+    public function update(TagRequest $request, $id, TagService $tagService)
     {
-        $tag = Tag::findOrFail($id);
-        $data = $request->all(['name', 'sort']);
         try {
+            $tag = $tagService->getOne($id);
+            $data = $request->all(['name', 'sort']);
             $tag->update($data);
             return Redirect::to(URL::route('admin.tag'))->with(['success' => '更新成功']);
         } catch (\Exception $exception) {
@@ -109,10 +120,13 @@ class TagController extends Controller
 
     /**
      * 删除标签
+     *
      * @param Request $request
+     * @param TagService $tagService
+     * @param ArticleService $articleService
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request,TagService $tagService,ArticleService $articleService)
     {
         $ids = $request->get('ids');
         if (!is_array($ids) || empty($ids)) {
@@ -121,9 +135,9 @@ class TagController extends Controller
         DB::beginTransaction();
         try {
             //删除中间表article_tag
-            DB::table('article_tag')->whereIn('tag_id', $ids)->delete();
+            $articleService->destroyManyTagArticle($ids);
             //删除主表tag
-            DB::table('tags')->whereIn('id', $ids)->delete();
+            $tagService->destroyManyTags($ids);
             DB::commit();
             return Response::json(['code' => 0, 'msg' => '删除成功']);
         } catch (\Exception $exception) {

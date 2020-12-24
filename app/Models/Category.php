@@ -12,7 +12,7 @@ class Category extends Model
     //子分类
     public function childs()
     {
-        return $this->hasMany('App\Models\Category','parent_id','id');
+        return $this->hasMany('App\Models\Category', 'parent_id', 'id');
     }
 
     //所有子类
@@ -25,6 +25,11 @@ class Category extends Model
     public function articles()
     {
         return $this->hasMany('App\Models\Article');
+    }
+
+    public static function getCategory($rank = 'asc')
+    {
+        return self::with('allChilds')->where('parent_id', 0)->orderBy('sort', $rank)->get();
     }
 
 }

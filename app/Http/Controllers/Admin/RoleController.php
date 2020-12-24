@@ -4,34 +4,43 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\RoleCreateRequest;
 use App\Http\Requests\RoleUpdateRequest;
-use App\Models\Permission;
-use App\Models\Role;
+use App\Service\PermissionService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\View;
+use App\Service\RoleService;
 
 class RoleController extends Controller
 {
+    protected $roleService;
+
+    public function __construct(RoleService $roleService)
+    {
+        $this->roleService = $roleService;
+    }
+
     /**
      * 角色列表
-     * @return \Illuminate\Contracts\View\View
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function index()
     {
-        return View::make('admin.role.index');
+        return view('admin.role.index');
     }
 
     /**
      * 角色列表接口数据
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function data(Request $request)
     {
-        $res = Role::paginate($request->get('limit', 30));
+        $res = $this->roleService->getRole($request);
         $data = [
             'code' => 0,
             'msg' => '正在请求中...',
@@ -43,23 +52,25 @@ class RoleController extends Controller
 
     /**
      * 添加角色
-     * @return \Illuminate\Contracts\View\View
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function create()
     {
-        return View::make('admin.role.create');
+        return view('admin.role.create');
     }
 
     /**
      * 添加角色
+     *
      * @param RoleCreateRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(RoleCreateRequest $request)
     {
-        $data = $request->only(['name', 'display_name']);
         try {
-            Role::create($data);
+            $this->roleService->store($request);
             return Redirect::to(URL::route('admin.role'))->with(['success' => '添加成功']);
         } catch (\Exception $exception) {
             return Redirect::back()->withErrors('添加失败');
@@ -79,26 +90,29 @@ class RoleController extends Controller
 
     /**
      * 更新角色
+     *
      * @param $id
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function edit($id)
     {
-        $role = Role::findOrFail($id);
-        return View::make('admin.role.edit', compact('role'));
+        $role = $this->roleService->getOne($id);
+        return view('admin.role.edit', compact('role'));
     }
 
     /**
      * 更新角色
+     *
      * @param RoleUpdateRequest $request
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(RoleUpdateRequest $request, $id)
     {
-        $role = Role::findOrFail($id);
-        $data = $request->only(['name', 'display_name']);
         try {
+            $role = $this->roleService->getOne($id);
+            $data = $request->only(['name', 'display_name']);
             $role->update($data);
             return Redirect::to(URL::route('admin.role'))->with(['success' => '更新成功']);
         } catch (\Exception $exception) {
@@ -108,6 +122,7 @@ class RoleController extends Controller
 
     /**
      * 删除角色
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -118,7 +133,7 @@ class RoleController extends Controller
             return Response::json(['code' => 1, 'msg' => '请选择删除项']);
         }
         try {
-            Role::destroy($ids);
+            $this->roleService->destroy($ids);
             return Response::json(['code' => 0, 'msg' => '删除成功']);
         } catch (\Exception $exception) {
             return Response::json(['code' => 1, 'msg' => '删除失败']);
@@ -127,14 +142,17 @@ class RoleController extends Controller
 
     /**
      * 分配权限
+     *
      * @param Request $request
      * @param $id
-     * @return \Illuminate\Contracts\View\View
+     * @param PermissionService $permissionService
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
-    public function permission(Request $request, $id)
+    public function permission(Request $request, $id,PermissionService $permissionService)
     {
-        $role = Role::findOrFail($id);
-        $permissions = Permission::with('allChilds')->where('parent_id', 0)->get();
+        $role = $this->roleService->getOne($id);
+        $permissions = $permissionService->getPermissionWithChild();
         foreach ($permissions as $p1) {
             $p1->own = $role->hasPermissionTo($p1->id) ? 'checked' : false;
             if ($p1->childs->isNotEmpty()) {
@@ -148,18 +166,19 @@ class RoleController extends Controller
                 }
             }
         }
-        return View::make('admin.role.permission', compact('role', 'permissions'));
+        return view('admin.role.permission', compact('role', 'permissions'));
     }
 
     /**
      * 存储权限
+     *
      * @param Request $request
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
     public function assignPermission(Request $request, $id)
     {
-        $role = Role::findOrFail($id);
+        $role = $this->roleService->getOne($id);
         $permissions = $request->get('permissions', []);
         try {
             $role->syncPermissions($permissions);
