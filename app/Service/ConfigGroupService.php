@@ -54,8 +54,13 @@ class ConfigGroupService
         return Configuration::pluck('val', 'key');
     }
 
-    public function updateConfiguration($k,$v)
+    public function updateConfiguration($k, $v)
     {
         return Configuration::where('key', $k)->update(['val' => $v]);
+    }
+
+    public function getCanDeleteConfiguration($type)
+    {
+        return Configuration::where('key', $type)->where('val', 1)->first();
     }
 }

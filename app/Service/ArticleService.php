@@ -38,4 +38,9 @@ class ArticleService
         return ArticleTag::whereIn('article_id', $ids)->delete();
     }
 
+    public function destroyManyTagArticle($ids)
+    {
+        return ArticleTag::whereIn('tag_id', $ids)->delete();
+    }
+
 }

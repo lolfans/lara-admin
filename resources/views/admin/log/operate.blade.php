@@ -39,11 +39,14 @@
 
 @section('script')
     <script>
-        layui.use(['layer', 'table', 'form'], function () {
+        layui.use(['layer', 'table', 'form','laydate'], function () {
             var $ = layui.jquery;
             var layer = layui.layer;
             var form = layui.form;
             var table = layui.table;
+            var laydate = layui.laydate;
+            laydate.render({elem:'#created_at_start',type:'datetime'});
+            laydate.render({elem:'#created_at_end',type:'datetime'});
             //用户表格初始化
             var dataTable = table.render({
                 elem: '#dataTable'

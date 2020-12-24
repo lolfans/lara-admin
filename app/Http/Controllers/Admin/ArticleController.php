@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
 use App\Service\ArticleService;
 use App\Service\CategoryService;
@@ -28,12 +27,13 @@ class ArticleController extends Controller
      * 资讯列表
      *
      * @param CategoryService $service
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function index(CategoryService $service)
     {
         $categories = $service->getCategory('asc');
-        return View::make('admin.article.index', compact('categories'));
+        return view('admin.article.index', compact('categories'));
     }
 
     /**
@@ -57,7 +57,10 @@ class ArticleController extends Controller
     /**
      * 添加资讯
      *
-     * @return \Illuminate\Contracts\View\View
+     * @param CategoryService $categoryService
+     * @param TagService $tagService
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function create(CategoryService $categoryService, TagService $tagService)
     {
@@ -66,7 +69,7 @@ class ArticleController extends Controller
         //标签
         $tags = $tagService->getTag();
 
-        return View::make('admin.article.create', compact('tags', 'categories'));
+        return view('admin.article.create', compact('tags', 'categories'));
     }
 
     /**
@@ -102,7 +105,10 @@ class ArticleController extends Controller
      * 更新资讯
      *
      * @param $id
-     * @return \Illuminate\Contracts\View\View
+     * @param CategoryService $categoryService
+     * @param TagService $tagService
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function edit($id, CategoryService $categoryService, TagService $tagService)
     {
@@ -114,7 +120,7 @@ class ArticleController extends Controller
         foreach ($tags as $tag) {
             $tag->checked = $article->tags->contains($tag) ? 'checked' : '';
         }
-        return View::make('admin.article.edit', compact('article', 'categories', 'tags'));
+        return view('admin.article.edit', compact('article', 'categories', 'tags'));
     }
 
     /**

@@ -16,4 +16,24 @@ class TagService
     {
         return Tag::get();
     }
+
+    public function getTagLimit($request)
+    {
+        return Tag::orderBy('sort', 'asc')->orderBy('id', 'desc')->paginate($request->get('limit', 30));
+    }
+
+    public function store($data)
+    {
+        return Tag::create($data);
+    }
+
+    public function getOne($id)
+    {
+        return Tag::findOrFail($id);
+    }
+
+    public function destroyManyTags($ids)
+    {
+        return  Tag::whereIn('id', $ids)->delete();
+    }
 }

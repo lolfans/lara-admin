@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\View;
 use App\Service\CategoryService;
 
 class CategoryController extends Controller
@@ -23,11 +22,12 @@ class CategoryController extends Controller
     /**
      * 分类列表
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function index()
     {
-        return View::make('admin.category.index');
+        return view('admin.category.index');
     }
 
     /**
@@ -51,12 +51,13 @@ class CategoryController extends Controller
     /**
      * 添加分类
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function create()
     {
         $categories = $this->categoryService->getCategory('asc');
-        return View::make('admin.category.create', compact('categories'));
+        return view('admin.category.create', compact('categories'));
     }
 
     /**
@@ -91,13 +92,14 @@ class CategoryController extends Controller
      * 更新分类
      *
      * @param $id
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function edit($id)
     {
         $category = $this->categoryService->getOne($id);
         $categories = $this->categoryService->getCategory('asc');
-        return View::make('admin.category.edit', compact('category', 'categories'));
+        return view('admin.category.edit', compact('category', 'categories'));
     }
 
     /**

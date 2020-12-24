@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\View;
 use App\Service\ConfigGroupService;
 
 class ConfigurationController extends Controller
@@ -23,23 +22,25 @@ class ConfigurationController extends Controller
     /**
      * 配置主页
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function index()
     {
         $groups = $this->configService->getManyConfigWithConfigurations();
-        return View::make('admin.configuration.index', compact('groups'));
+        return view('admin.configuration.index', compact('groups'));
     }
 
     /**
      * 添加配置
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function create()
     {
         $groups = $this->configService->getConfigs();
-        return View::make('admin.configuration.create', compact('groups'));
+        return view('admin.configuration.create', compact('groups'));
     }
 
     /**

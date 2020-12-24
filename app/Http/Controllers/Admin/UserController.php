@@ -15,30 +15,36 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\View;
-use App\Models\User;
 use App\Models\Role;
 use App\Models\Permission;
-use Illuminate\Validation\ValidationException;
+use App\Service\UserService;
 
 class UserController extends Controller
 {
 
     use AuthenticatesUsers;
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
 
     /**
      * 用户登录表单
-     * @return \Illuminate\Contracts\View\View
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function showLoginForm()
     {
-        return View::make('admin.user.login');
+        return view('admin.user.login');
     }
 
     /**
      * 验证登录字段
+     *
      * @param Request $request
-     * @throws \Illuminate\Validation\ValidationException
      */
     protected function validateLogin(Request $request)
     {
@@ -57,6 +63,7 @@ class UserController extends Controller
 
     /**
      * 退出后的动作
+     *
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
@@ -103,15 +110,18 @@ class UserController extends Controller
 
     /**
      * 更改密码
-     * @return \Illuminate\Contracts\View\View
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function changeMyPasswordForm()
     {
-        return View::make('admin.user.changeMyPassword');
+        return view('admin.user.changeMyPassword');
     }
 
     /**
      * 修改密码
+     *
      * @param ChangePasswordRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -132,16 +142,18 @@ class UserController extends Controller
 
     /**
      * 用户列表主页
-     * @return \Illuminate\Contracts\View\View
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function index()
     {
-        return View::make('admin.user.index');
+        return view('admin.user.index');
     }
 
     public function data(Request $request)
     {
-        $res = User::paginate($request->get('limit', 30));
+        $res = $this->userService->getUserLimit($request);
         $data = [
             'code' => 0,
             'msg' => '正在请求中...',
@@ -153,23 +165,27 @@ class UserController extends Controller
 
     /**
      * 添加用户
-     * @return \Illuminate\Contracts\View\View
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function create()
     {
-        return View::make('admin.user.create');
+        return view('admin.user.create');
     }
 
     /**
      * 添加用户
+     *
      * @param UserCreateRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(UserCreateRequest $request)
     {
-        $data = $request->all();
+
         try {
-            User::create($data);
+            $data = $request->all();
+            $this->userService->store($data);
             return Redirect::to(URL::route('admin.user'))->with(['success' => '添加成功']);
         } catch (\Exception $exception) {
             return Redirect::back()->withErrors('添加失败');
@@ -189,13 +205,15 @@ class UserController extends Controller
 
     /**
      * 更新用户
+     *
      * @param $id
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function edit($id)
     {
-        $user = User::findOrFail($id);
-        return View::make('admin.user.edit', compact('user'));
+        $user = $this->userService->getOne($id);
+        return view('admin.user.edit', compact('user'));
     }
 
     /**
@@ -206,7 +224,7 @@ class UserController extends Controller
      */
     public function update(UserUpdateRequest $request, $id)
     {
-        $user = User::findOrFail($id);
+        $user = $this->userService->getOne($id);
         $data = $request->except('password');
         if ($request->get('password')) {
             $data['password'] = $request->get('password');
@@ -231,7 +249,7 @@ class UserController extends Controller
             return Response::json(['code' => 1, 'msg' => '请选择删除项']);
         }
         try {
-            User::destroy($ids);
+            $this->userService->destroyManyUser($ids);
             return Response::json(['code' => 0, 'msg' => '删除成功']);
         } catch (\Exception $exception) {
             return Response::json(['code' => 1, 'msg' => '删除失败']);
@@ -240,28 +258,31 @@ class UserController extends Controller
 
     /**
      * 分配角色
+     *
      * @param $id
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function role($id)
     {
-        $user = User::findOrFail($id);
+        $user = $this->userService->getOne($id);
         $roles = Role::get();
         foreach ($roles as $role) {
             $role->own = $user->hasRole($role) ? true : false;
         }
-        return View::make('admin.user.role', compact('roles', 'user'));
+        return view('admin.user.role', compact('roles', 'user'));
     }
 
     /**
      * 分配角色
+     *
      * @param Request $request
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
     public function assignRole(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $user = $this->userService->getOne($id);
         $roles = $request->get('roles', []);
         try {
             $user->syncRoles($roles);
@@ -273,12 +294,14 @@ class UserController extends Controller
 
     /**
      * 分配直接权限
+     *
      * @param $id
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function permission($id)
     {
-        $user = User::findOrFail($id);
+        $user = $this->userService->getOne($id);
         $permissions = Permission::with('allChilds')->where('parent_id', 0)->get();
         foreach ($permissions as $p1) {
             $p1->own = $user->hasDirectPermission($p1->id) ? 'checked' : '';
@@ -293,18 +316,19 @@ class UserController extends Controller
                 }
             }
         }
-        return View::make('admin.user.permission', compact('user', 'permissions'));
+        return view('admin.user.permission', compact('user', 'permissions'));
     }
 
     /**
      * 分配直接权限
+     *
      * @param Request $request
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
     public function assignPermission(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $user = $this->userService->getOne($id);
         $permissions = $request->get('permissions', []);
         try {
             $user->syncPermissions($permissions);

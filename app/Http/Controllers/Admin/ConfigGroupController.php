@@ -9,7 +9,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\View;
 
 class ConfigGroupController extends Controller
 {
@@ -23,11 +22,12 @@ class ConfigGroupController extends Controller
     /**
      * 标签列表
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function index()
     {
-        return View::make('admin.config_group.index');
+        return view('admin.config_group.index');
     }
 
     /**
@@ -51,11 +51,12 @@ class ConfigGroupController extends Controller
     /**
      * 添加标签
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function create()
     {
-        return View::make('admin.config_group.create');
+        return view('admin.config_group.create');
     }
 
     /**
@@ -91,12 +92,13 @@ class ConfigGroupController extends Controller
      * 更新标签
      *
      * @param $id
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function edit($id)
     {
         $configGroup = $this->configService->getOne($id);
-        return View::make('admin.config_group.edit', compact('configGroup'));
+        return view('admin.config_group.edit', compact('configGroup'));
     }
 
     /**
