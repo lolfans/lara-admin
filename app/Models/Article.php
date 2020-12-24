@@ -29,4 +29,17 @@ class Article extends Model
         return $this->belongsToMany('App\Models\Tag','article_tag','article_id','tag_id');
     }
 
+    public static function getData($request)
+    {
+        $model = self::query();
+        if ($request->get('category_id')) {
+            $model = $model->where('category_id', $request->get('category_id'));
+        }
+        if ($request->get('title')) {
+            $model = $model->where('title', 'like', '%' . $request->get('title') . '%');
+        }
+        $result = $model->with(['tags', 'category'])->orderBy('id', 'desc')->paginate($request->get('limit', 30));
+        return $result;
+    }
+
 }

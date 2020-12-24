@@ -3,33 +3,42 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\CategoryRequest;
-use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\View;
+use App\Service\CategoryService;
 
 class CategoryController extends Controller
 {
+    protected $categoryService;
+
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     /**
      * 分类列表
-     * @return \Illuminate\Contracts\View\View
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function index()
     {
-        return View::make('admin.category.index');
+        return view('admin.category.index');
     }
 
     /**
      * 分类列表数据接口
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function data(Request $request)
     {
-        $res = Category::get();
+        $res = $this->categoryService->getCategoryAll();
         $data = [
             'code' => 0,
             'msg' => '正在请求中...',
@@ -41,24 +50,27 @@ class CategoryController extends Controller
 
     /**
      * 添加分类
-     * @return \Illuminate\Contracts\View\View
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function create()
     {
-        $categories = Category::with('allChilds')->where('parent_id', 0)->orderBy('sort', 'asc')->orderBy('id', 'desc')->get();
-        return View::make('admin.category.create', compact('categories'));
+        $categories = $this->categoryService->getCategory('asc');
+        return view('admin.category.create', compact('categories'));
     }
 
     /**
      * 添加分类
+     *
      * @param CategoryRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(CategoryRequest $request)
     {
-        $data = $request->all(['name', 'sort', 'parent_id']);
         try {
-            Category::create($data);
+            $data = $request->all(['name', 'sort', 'parent_id']);
+            $this->categoryService->store($data);
             return Redirect::to(URL::route('admin.category'))->with(['success' => '添加成功']);
         } catch (\Exception $exception) {
             return Redirect::back()->withErrors('添加失败');
@@ -78,27 +90,30 @@ class CategoryController extends Controller
 
     /**
      * 更新分类
+     *
      * @param $id
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
+     * @throws \Throwable
      */
     public function edit($id)
     {
-        $category = Category::findOrFail($id);
-        $categories = Category::with('allChilds')->where('parent_id', 0)->orderBy('sort', 'asc')->orderBy('id', 'desc')->get();
-        return View::make('admin.category.edit', compact('category', 'categories'));
+        $category = $this->categoryService->getOne($id);
+        $categories = $this->categoryService->getCategory('asc');
+        return view('admin.category.edit', compact('category', 'categories'));
     }
 
     /**
      * 更新分类
+     *
      * @param CategoryRequest $request
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(CategoryRequest $request, $id)
     {
-        $category = Category::findOrFail($id);
-        $data = $request->all(['name', 'sort', 'parent_id']);
         try {
+            $data = $request->all(['name', 'sort', 'parent_id']);
+            $category = $this->categoryService->getOne($id);
             $category->update($data);
             return Redirect::to(URL::route('admin.category'))->with(['success' => '更新成功']);
         } catch (\Exception $exception) {
@@ -108,13 +123,14 @@ class CategoryController extends Controller
 
     /**
      * 删除分类
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request)
     {
         $ids = $request->get('ids');
-        $category = Category::with(['childs', 'articles'])->find($ids[0]);
+        $category = $this->categoryService->getWithChildAndArticle($ids[0]);
         if ($category == null) {
             return Response::json(['code' => 1, 'msg' => '分类不存在']);
         }
