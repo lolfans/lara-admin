@@ -143,23 +143,10 @@ Route::group(['namespace'=>'Admin','prefix'=>'admin','middleware'=>['auth','perm
 
 /*
 |--------------------------------------------------------------------------
-| 资讯管理模块
+| 文章管理模块
 |--------------------------------------------------------------------------
 */
 Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['auth', 'permission:information', 'operate.log']], function () {
-    //分类管理
-    Route::group(['middleware' => 'permission:information.category'], function () {
-        Route::get('category/data', 'CategoryController@data')->name('admin.category.data');
-        Route::get('category', 'CategoryController@index')->name('admin.category');
-        //添加分类
-        Route::get('category/create', 'CategoryController@create')->name('admin.category.create')->middleware('permission:information.category.create');
-        Route::post('category/store', 'CategoryController@store')->name('admin.category.store')->middleware('permission:information.category.create');
-        //编辑分类
-        Route::get('category/{id}/edit', 'CategoryController@edit')->name('admin.category.edit')->middleware('permission:information.category.edit');
-        Route::put('category/{id}/update', 'CategoryController@update')->name('admin.category.update')->middleware('permission:information.category.edit');
-        //删除分类
-        Route::delete('category/destroy', 'CategoryController@destroy')->name('admin.category.destroy')->middleware('permission:information.category.destroy');
-    });
     //文章管理
     Route::group(['middleware' => 'permission:information.article'], function () {
         Route::get('article/data', 'ArticleController@data')->name('admin.article.data');
@@ -172,18 +159,5 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['aut
         Route::put('article/{id}/update', 'ArticleController@update')->name('admin.article.update')->middleware('permission:information.article.edit');
         //删除
         Route::delete('article/destroy', 'ArticleController@destroy')->name('admin.article.destroy')->middleware('permission:information.article.destroy');
-    });
-    //标签管理
-    Route::group(['middleware' => 'permission:information.tag'], function () {
-        Route::get('tag/data', 'TagController@data')->name('admin.tag.data');
-        Route::get('tag', 'TagController@index')->name('admin.tag');
-        //添加
-        Route::get('tag/create', 'TagController@create')->name('admin.tag.create')->middleware('permission:information.tag.create');
-        Route::post('tag/store', 'TagController@store')->name('admin.tag.store')->middleware('permission:information.tag.create');
-        //编辑
-        Route::get('tag/{id}/edit', 'TagController@edit')->name('admin.tag.edit')->middleware('permission:information.tag.edit');
-        Route::put('tag/{id}/update', 'TagController@update')->name('admin.tag.update')->middleware('permission:information.tag.edit');
-        //删除
-        Route::delete('tag/destroy', 'TagController@destroy')->name('admin.tag.destroy')->middleware('permission:information.tag.destroy');
     });
 });
