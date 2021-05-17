@@ -19,6 +19,11 @@
 
 <script src="/static/admin/layuiadmin/layui/layui.js"></script>
 <script>
+    /**
+     * 针对跳转到其他页面时，不替换当前页内容，就新打开一个tab及页面
+     * @param url
+     * @param tit
+     */
     function newTab(url,tit){
         if(top.layui.index){
             top.layui.index.openTabsPage(url,tit)
