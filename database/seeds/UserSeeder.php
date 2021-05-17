@@ -117,44 +117,6 @@ class UserSeeder extends Seeder
                     ],
                 ]
             ],
-            [
-                'name' => 'information',
-                'display_name' => '资讯管理',
-                'route' => '',
-                'icon' => 'layui-icon-read',
-                'child' => [
-                    [
-                        'name' => 'information.category',
-                        'display_name' => '分类管理',
-                        'route' => 'admin.category',
-                        'child' => [
-                            ['name' => 'information.category.create', 'display_name' => '添加分类','route'=>'admin.category.create'],
-                            ['name' => 'information.category.edit', 'display_name' => '编辑分类','route'=>'admin.category.edit'],
-                            ['name' => 'information.category.destroy', 'display_name' => '删除分类','route'=>'admin.category.destroy'],
-                        ]
-                    ],
-                    [
-                        'name' => 'information.tag',
-                        'display_name' => '标签管理',
-                        'route' => 'admin.tag',
-                        'child' => [
-                            ['name' => 'information.tag.create', 'display_name' => '添加标签','route'=>'admin.tag.create'],
-                            ['name' => 'information.tag.edit', 'display_name' => '编辑标签','route'=>'admin.tag.edit'],
-                            ['name' => 'information.tag.destroy', 'display_name' => '删除标签','route'=>'admin.tag.destroy'],
-                        ]
-                    ],
-                    [
-                        'name' => 'information.article',
-                        'display_name' => '文章管理',
-                        'route' => 'admin.article',
-                        'child' => [
-                            ['name' => 'information.article.create', 'display_name' => '添加文章','route'=>'admin.article.create'],
-                            ['name' => 'information.article.edit', 'display_name' => '编辑文章','route'=>'admin.article.edit'],
-                            ['name' => 'information.article.destroy', 'display_name' => '删除文章','route'=>'admin.article.destroy'],
-                        ]
-                    ],
-                ]
-            ],
         ];
 
         foreach ($permissions as $pem1) {
