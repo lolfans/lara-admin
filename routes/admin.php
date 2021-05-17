@@ -146,18 +146,18 @@ Route::group(['namespace'=>'Admin','prefix'=>'admin','middleware'=>['auth','perm
 | 文章管理模块
 |--------------------------------------------------------------------------
 */
-Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['auth', 'permission:information', 'operate.log']], function () {
-    //文章管理
-    Route::group(['middleware' => 'permission:information.article'], function () {
-        Route::get('article/data', 'ArticleController@data')->name('admin.article.data');
-        Route::get('article', 'ArticleController@index')->name('admin.article');
-        //添加
-        Route::get('article/create', 'ArticleController@create')->name('admin.article.create')->middleware('permission:information.article.create');
-        Route::post('article/store', 'ArticleController@store')->name('admin.article.store')->middleware('permission:information.article.create');
-        //编辑
-        Route::get('article/{id}/edit', 'ArticleController@edit')->name('admin.article.edit')->middleware('permission:information.article.edit');
-        Route::put('article/{id}/update', 'ArticleController@update')->name('admin.article.update')->middleware('permission:information.article.edit');
-        //删除
-        Route::delete('article/destroy', 'ArticleController@destroy')->name('admin.article.destroy')->middleware('permission:information.article.destroy');
-    });
-});
+//Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['auth', 'permission:information', 'operate.log']], function () {
+//    //文章管理
+//    Route::group(['middleware' => 'permission:information.article'], function () {
+//        Route::get('article/data', 'ArticleController@data')->name('admin.article.data');
+//        Route::get('article', 'ArticleController@index')->name('admin.article');
+//        //添加
+//        Route::get('article/create', 'ArticleController@create')->name('admin.article.create')->middleware('permission:information.article.create');
+//        Route::post('article/store', 'ArticleController@store')->name('admin.article.store')->middleware('permission:information.article.create');
+//        //编辑
+//        Route::get('article/{id}/edit', 'ArticleController@edit')->name('admin.article.edit')->middleware('permission:information.article.edit');
+//        Route::put('article/{id}/update', 'ArticleController@update')->name('admin.article.update')->middleware('permission:information.article.edit');
+//        //删除
+//        Route::delete('article/destroy', 'ArticleController@destroy')->name('admin.article.destroy')->middleware('permission:information.article.destroy');
+//    });
+//});
