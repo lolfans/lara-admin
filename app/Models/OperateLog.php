@@ -13,14 +13,20 @@ class OperateLog extends Model
     {
         $data = $request->all(['created_at_start', 'created_at_end']);
 
-        $result = OperateLog::when($data['created_at_start'] && !$data['created_at_end'], function ($query) use ($data) {
-            return $query->where('created_at', '>=', $data['created_at_start']);
-        })->when(!$data['created_at_start'] && $data['created_at_end'], function ($query) use ($data) {
-            return $query->where('created_at', '<=', $data['created_at_end']);
-        })->when($data['created_at_start'] && $data['created_at_end'], function ($query) use ($data) {
-            return $query->whereBetween('created_at', [$data['created_at_start'], $data['created_at_end']]);
-        })->orderBy('id', 'desc')->paginate($request->get('limit', 30));
+        $result = OperateLog::select('operate_log.*', 'users.username')
+            ->leftJoin('users', 'users.id', '=', 'operate_log.user_id')->when($data['created_at_start'] && !$data['created_at_end'], function ($query) use ($data) {
+                return $query->where('created_at', '>=', $data['created_at_start']);
+            })->when(!$data['created_at_start'] && $data['created_at_end'], function ($query) use ($data) {
+                return $query->where('created_at', '<=', $data['created_at_end']);
+            })->when($data['created_at_start'] && $data['created_at_end'], function ($query) use ($data) {
+                return $query->whereBetween('created_at', [$data['created_at_start'], $data['created_at_end']]);
+            })->orderBy('id', 'desc')->paginate($request->get('limit', 30));
 
         return $result;
+    }
+
+    public function user()
+    {
+        return $this->hasOne('App\Models\User', 'id', 'user_id');
     }
 }
