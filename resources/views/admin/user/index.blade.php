@@ -112,7 +112,7 @@
                             var load = layer.load();
                             $.post("{{ route('admin.user.destroy') }}", {
                                 _method: 'delete',
-                                ids: [data.id]
+                                ids: ids
                             }, function (res) {
                                 layer.close(load);
                                 if (res.code == 0) {
