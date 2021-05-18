@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="/static/admin/layuiadmin/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/admin/layuiadmin/style/admin.css" media="all">
     <link rel="stylesheet" href="/static/admin/layuiadmin/style/login.css" media="all">
+    <style>
+        body {background-image: url("/static/bg.jpg");height:100%;width:100%;}
+    </style>
 </head>
 <body>
 <div class="layadmin-user-login layadmin-user-display-show">
