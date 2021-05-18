@@ -52,7 +52,7 @@
                     </div>
                 </div>
                 <div class="layui-form-item">
-                    <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="*">登 入</button>
+                    <button class="layui-btn layui-btn-primary layui-btn-fluid" lay-submit lay-filter="*">登 入</button>
                 </div>
             </form>
 
