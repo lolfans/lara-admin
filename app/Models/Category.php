@@ -29,7 +29,12 @@ class Category extends Model
 
     public static function getCategory($rank = 'asc')
     {
-        return self::with('allChilds')->where('parent_id', 0)->orderBy('sort', $rank)->get();
+        return self::with('allChilds')->Parent()->orderBy('sort', $rank)->get();
+    }
+
+    public function scopeParent($query)
+    {
+        return $query->where('parent_id', 0);
     }
 
 }

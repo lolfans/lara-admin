@@ -13,8 +13,8 @@ class OperateLog extends Model
     {
         $data = $request->all(['created_at_start', 'created_at_end']);
 
-        $result = OperateLog::select('operate_log.*', 'users.username')
-            ->leftJoin('users', 'users.id', '=', 'operate_log.user_id')->when($data['created_at_start'] && !$data['created_at_end'], function ($query) use ($data) {
+        $result = OperateLog::with('user:id,username')
+            ->when($data['created_at_start'] && !$data['created_at_end'], function ($query) use ($data) {
                 return $query->where('created_at', '>=', $data['created_at_start']);
             })->when(!$data['created_at_start'] && $data['created_at_end'], function ($query) use ($data) {
                 return $query->where('created_at', '<=', $data['created_at_end']);
