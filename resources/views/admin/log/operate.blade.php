@@ -57,7 +57,9 @@
                 , cols: [[ //表头
                     {checkbox: true, fixed: true}
                     , {field: 'id', title: 'ID', sort: true, width: 80}
-                    , {field: 'username', title: '用户名'}
+                    , {field: 'username', title: '用户名',templet:function (d) {
+                            return d.user.username ? d.user.username : '';
+                        }}
                     , {field: 'ip', sort: true, title: 'ip地址'}
                     , {field: 'method', sort: true, title: '请求方式'}
                     , {field: 'user_agent', sort: true, title: 'UserAgent'}

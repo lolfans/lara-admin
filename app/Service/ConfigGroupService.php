@@ -13,14 +13,15 @@ use App\Models\Configuration;
 
 class ConfigGroupService
 {
+
     public function getConfigs()
     {
-        return ConfigGroup::orderBy('sort', 'asc')->orderBy('id', 'desc')->get();
+        return ConfigGroup::OrderSortAsc()->OrderIdDesc()->get();
     }
 
     public function getConfigLimit($request)
     {
-        return ConfigGroup::orderBy('sort', 'asc')->orderBy('id', 'desc')->paginate($request->get('limit', 30));
+        return ConfigGroup::OrderSortAsc()->OrderIdDesc()->paginate($request->get('limit', 30));
     }
 
     public function store($data)
@@ -41,7 +42,7 @@ class ConfigGroupService
 
     public function getManyConfigWithConfigurations()
     {
-        return ConfigGroup::with('configurations')->orderBy('sort', 'asc')->get();
+        return ConfigGroup::with('configurations')->OrderSortAsc()->get();
     }
 
     public function storeConfiguration($data)
@@ -61,6 +62,6 @@ class ConfigGroupService
 
     public function getCanDeleteConfiguration($type)
     {
-        return Configuration::where('key', $type)->where('val', 1)->first();
+        return Configuration::where('key', $type)->CanDelete()->first();
     }
 }
