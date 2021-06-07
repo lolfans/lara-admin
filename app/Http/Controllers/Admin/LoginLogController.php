@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
-use App\Service\LoginLogService;
-use App\Service\ConfigGroupService;
+use App\Service\Contract\LoginLogServiceInterface;
+use App\Service\Contract\ConfigGroupServiceInterface;
 
 class LoginLogController extends Controller
 {
     protected $loginLogService;
 
-    public function __construct(LoginLogService $loginLogService)
+    public function __construct(LoginLogServiceInterface $loginLogService)
     {
         $this->loginLogService = $loginLogService;
     }
@@ -52,7 +52,7 @@ class LoginLogController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, ConfigGroupService $configGroupService)
+    public function destroy(Request $request, ConfigGroupServiceInterface $configGroupService)
     {
         $ids = $request->get('ids');
         if (!is_array($ids) || empty($ids)) {

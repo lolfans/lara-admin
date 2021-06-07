@@ -9,13 +9,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
-use App\Service\PermissionService;
+use App\Service\Contract\PermissionServiceInterface;
 
 class PermissionController extends Controller
 {
     protected $permissionService;
 
-    public function __construct(PermissionService $permissionService)
+    public function __construct(PermissionServiceInterface $permissionService)
     {
         $this->permissionService = $permissionService;
     }

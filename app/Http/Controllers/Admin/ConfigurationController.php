@@ -8,13 +8,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
-use App\Service\ConfigGroupService;
+use App\Service\Contract\ConfigGroupServiceInterface;
 
 class ConfigurationController extends Controller
 {
     protected $configService;
 
-    public function __construct(ConfigGroupService $configGroupService)
+    public function __construct(ConfigGroupServiceInterface $configGroupService)
     {
         $this->configService = $configGroupService;
     }

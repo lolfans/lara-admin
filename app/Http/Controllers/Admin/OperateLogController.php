@@ -7,14 +7,14 @@ use App\Models\OperateLog;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
-use App\Service\OperaLogService;
-use App\Service\ConfigGroupService;
+use App\Service\Contract\OperaLogServiceInterface;
+use App\Service\Contract\ConfigGroupServiceInterface;
 
 class OperateLogController extends Controller
 {
     protected $operaLogService;
 
-    public function __construct(OperaLogService $operaLogService)
+    public function __construct(OperaLogServiceInterface $operaLogService)
     {
         $this->operaLogService = $operaLogService;
     }
@@ -54,7 +54,7 @@ class OperateLogController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, ConfigGroupService $configGroupService)
+    public function destroy(Request $request, ConfigGroupServiceInterface $configGroupService)
     {
         $ids = $request->get('ids');
         if (!is_array($ids) || empty($ids)) {

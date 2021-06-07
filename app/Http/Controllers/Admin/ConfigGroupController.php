@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\ConfigGroupRequest;
-use App\Service\ConfigGroupService;
+use App\Service\Contract\ConfigGroupServiceInterface;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
@@ -14,7 +14,7 @@ class ConfigGroupController extends Controller
 {
     protected $configService;
 
-    public function __construct(ConfigGroupService $configGroupService)
+    public function __construct(ConfigGroupServiceInterface $configGroupService)
     {
         $this->configService = $configGroupService;
     }

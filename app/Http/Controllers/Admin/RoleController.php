@@ -4,19 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\RoleCreateRequest;
 use App\Http\Requests\RoleUpdateRequest;
-use App\Service\PermissionService;
+use App\Service\Contract\PermissionServiceInterface;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
-use App\Service\RoleService;
+use App\Service\Contract\RoleServiceInterface;
 
 class RoleController extends Controller
 {
     protected $roleService;
 
-    public function __construct(RoleService $roleService)
+    public function __construct(RoleServiceInterface $roleService)
     {
         $this->roleService = $roleService;
     }
@@ -149,7 +149,7 @@ class RoleController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Swoft\Http\Message\Response|\think\response\View
      * @throws \Throwable
      */
-    public function permission(Request $request, $id,PermissionService $permissionService)
+    public function permission(Request $request, $id,PermissionServiceInterface $permissionService)
     {
         $role = $this->roleService->getOne($id);
         $permissions = $permissionService->getPermissionWithChild();

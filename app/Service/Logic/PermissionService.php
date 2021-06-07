@@ -6,11 +6,12 @@
  * Time: 16:23
  */
 
-namespace App\Service;
+namespace App\Service\Logic;
 
 use App\Models\Permission;
+use App\Service\Contract\PermissionServiceInterface;
 
-class PermissionService
+class PermissionService implements PermissionServiceInterface
 {
     public function getPermission()
     {

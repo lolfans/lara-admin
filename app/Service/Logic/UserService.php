@@ -6,13 +6,13 @@
  * Time: 16:23
  */
 
-namespace App\Service;
+namespace App\Service\Logic;
 
 use App\Models\User;
+use App\Service\Contract\UserServiceInterface;
 
-class UserService
+class UserService implements UserServiceInterface
 {
-
     public function getUserLimit($request)
     {
         return User::paginate($request->get('limit', 30));
@@ -30,6 +30,6 @@ class UserService
 
     public function destroyManyUser($ids)
     {
-        return  User::destroy($ids);
+        return User::destroy($ids);
     }
 }

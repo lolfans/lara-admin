@@ -6,11 +6,12 @@
  * Time: 16:23
  */
 
-namespace App\Service;
+namespace App\Service\Logic;
 
 use App\Models\Role;
+use App\Service\Contract\RoleServiceInterface;
 
-class RoleService
+class RoleService implements RoleServiceInterface
 {
     public function getRole($request)
     {

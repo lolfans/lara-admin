@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
 use App\Models\Role;
 use App\Models\Permission;
-use App\Service\UserService;
+use App\Service\Contract\UserServiceInterface;
 
 class UserController extends Controller
 {
@@ -25,7 +25,7 @@ class UserController extends Controller
     use AuthenticatesUsers;
     protected $userService;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserServiceInterface $userService)
     {
         $this->userService = $userService;
     }

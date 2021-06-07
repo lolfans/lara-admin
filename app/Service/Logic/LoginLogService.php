@@ -6,11 +6,12 @@
  * Time: 16:23
  */
 
-namespace App\Service;
+namespace App\Service\Logic;
 
 use App\Models\LoginLog;
+use App\Service\Contract\LoginLogServiceInterface;
 
-class LoginLogService
+class LoginLogService implements LoginLogServiceInterface
 {
     public function getLoginLog($request)
     {

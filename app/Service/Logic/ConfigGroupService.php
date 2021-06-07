@@ -6,14 +6,14 @@
  * Time: 16:23
  */
 
-namespace App\Service;
+namespace App\Service\Logic;
 
 use App\Models\ConfigGroup;
 use App\Models\Configuration;
+use App\Service\Contract\ConfigGroupServiceInterface;
 
-class ConfigGroupService
+class ConfigGroupService implements ConfigGroupServiceInterface
 {
-
     public function getConfigs()
     {
         return ConfigGroup::OrderSortAsc()->OrderIdDesc()->get();
@@ -24,18 +24,18 @@ class ConfigGroupService
         return ConfigGroup::OrderSortAsc()->OrderIdDesc()->paginate($request->get('limit', 30));
     }
 
-    public function store($data)
+    public function store(array $data)
     {
         return ConfigGroup::create($data);
 
     }
 
-    public function getOne($id)
+    public function getOne(int $id)
     {
         return ConfigGroup::findOrFail($id);
     }
 
-    public function getOneWithConfigurations($id)
+    public function getOneWithConfigurations(int $id)
     {
         return ConfigGroup::with('configurations')->find($id);
     }
@@ -45,7 +45,7 @@ class ConfigGroupService
         return ConfigGroup::with('configurations')->OrderSortAsc()->get();
     }
 
-    public function storeConfiguration($data)
+    public function storeConfiguration(array $data)
     {
         return Configuration::create($data);
     }
